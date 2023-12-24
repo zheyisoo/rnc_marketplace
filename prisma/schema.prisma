@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int      @id @default(autoincrement())
+  username       String   @unique
+  email          String   @unique
+  password       String
+  externalUSerId String   @unique
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Item {
+  id        Int      @id @default(autoincrement())
+  name      String
+  price     Float
+  category  Category
+  quantity  Int @default(0)
+  transactions Transaction[]
+  imageUrls String @default("https://via.placeholder.com/150")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Transaction {
+  id        Int      @id @default(autoincrement())
+  item      Item     @relation(fields: [itemId], references: [id])
+  itemId    Int
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  updatedBy String @default("system")
+  updatedById Int
+}
+
+enum Category {
+  FOOD
+  DRINK
+}
