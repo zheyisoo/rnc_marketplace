@@ -1,7 +1,5 @@
 import React, { useEffect } from 'react';
 import { db } from '@/lib/db';
-import { AddNewItem } from './_components/addNewItem';
-import ItemList from './_components/ItemList';
   
 const ItemsPage = async () => {
 

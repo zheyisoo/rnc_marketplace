@@ -1,11 +1,12 @@
-"use client";
+// "use client";
 
-import { useAuth,useUser } from "@clerk/nextjs";
+import { auth, currentUser } from "@clerk/nextjs";
 import { UserButton } from "@clerk/nextjs";
 
-const ProtectedPage = () => {
-    const { userId } = useAuth();
-    const { user } = useUser();
+const ProtectedPage = async () => {
+    // const { userId } = useAuth();
+    const { userId } = auth();
+    const user = await currentUser()
 
   return (
     <div>
