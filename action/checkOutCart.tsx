@@ -10,7 +10,7 @@ import { redirect } from 'next/navigation'
 import { User } from '@prisma/client';
 import { CartItem } from '@prisma/client';
 
-const checkOutCart = async (cartItems:CartItem[],userId:string) => {
+const CheckOutCart = async (cartItems:CartItem[],userId:string) => {
     console.log("run her?")
     try {
         if (!userId) {
@@ -80,4 +80,4 @@ const checkOutCart = async (cartItems:CartItem[],userId:string) => {
     }
 };
 
-export default checkOutCart;
+export default CheckOutCart;

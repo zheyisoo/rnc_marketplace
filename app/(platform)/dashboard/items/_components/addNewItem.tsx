@@ -57,7 +57,7 @@ export const AddNewItem = () => {
             <DialogHeader>
                 <DialogTitle>Create New Item</DialogTitle>
                 <DialogDescription>
-                Create new item here. Click save when you're done.
+                Create new item here. Click save when you are done.
                 </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">

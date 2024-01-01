@@ -36,7 +36,6 @@ const Header: React.FC<HeaderProps> = ({userId}) => {
   ];
   const router = useRouter();
   const handleOpenCart = () => {
-    console.log("run here? yuser??",user)
     if (dbUser){
       router.push(`/dashboard/cart/${dbUser}`);
     }
@@ -77,9 +76,9 @@ const Header: React.FC<HeaderProps> = ({userId}) => {
           </div>
           <nav className="mx-6 flex items-center space-x-4 lg:space-x-6 hidden md:block">
             {routes.map((route, i) => (
-              <Button asChild variant="ghost">
+              <Button key={i+"button"} asChild variant="ghost">
                 <Link
-                  key={i}
+                  key={i+"link"}
                   href={route.href}
                   className="text-sm font-medium transition-colors"
                 >

@@ -123,7 +123,7 @@ return (
         <DialogHeader>
             <DialogTitle>Edit Item Details</DialogTitle>
             <DialogDescription>
-            Make changes to the item here. Click save when you're done.
+            Make changes to the item here. Click save when you are done.
             </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">

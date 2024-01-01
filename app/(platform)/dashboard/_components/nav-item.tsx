@@ -63,6 +63,8 @@ export const NavItem = ({
     },
   ];
 
+  
+  const router = useRouter();
   const onClick = (href: string) => {
     router.push(href);
   };
