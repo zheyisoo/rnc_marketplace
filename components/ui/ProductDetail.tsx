@@ -12,13 +12,6 @@ import {
     DialogTrigger,
     DialogFooter
 } from "@/components/ui/dialog"
-import {
-Select,
-SelectContent,
-SelectItem,
-SelectTrigger,
-SelectValue,
-} from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -39,7 +32,7 @@ interface ItemDetailProps {
 
 const ProductDetail: React.FC<ItemDetailProps> = ({item,userId}) => { 
     const [name, setName] = useState(''); // Use an empty string as a default value
-    const [isOpen, setIsOpen] = useState(true);
+    const [isOpen, setIsOpen] = useState(false);
     const [quantity, setQuantity] = useState(0);
     const [price, setPrice] = useState(0);
     const [category, setCategory] = useState<Category>(Category.FOOD);
@@ -48,35 +41,22 @@ const ProductDetail: React.FC<ItemDetailProps> = ({item,userId}) => {
 
 
     const handleAddToCart = () => {
-        console.log("run here???")
         updateUserCart(item, quantity,dbUser)
-        // const newItem: Item = {
-        //     id: 0,
-        //     name: name,
-        //     price: price,
-        //     quantity: quantity,
-
-        //     category: Category.FOOD,
-        //     updatedAt: new Date(),
-        //     createdAt: new Date(),
-        // };
-        // addNewItem(newItem)
         setIsOpen(false);
     }
-    
+
     useEffect(() => {
-        console.log("itemList", item)
-        // setItems(item);
         if (user){
             setdbUser(user.id)
         }
         setIsOpen(true)
         // initiateItem()  
       }, [item]);
+
     return (
         <div>
             {/* <Button onClick ={()=>setIsOpen(true)} variant="outline">Add New Item</Button> */}
-            <Dialog onOpenChange={()=>setIsOpen(false)} open = {isOpen}>
+            <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
                 <DialogTitle>Add To Order</DialogTitle>

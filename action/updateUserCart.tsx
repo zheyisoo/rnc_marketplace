@@ -28,9 +28,10 @@ const updateUserCart = async (item:Item, quantity:number,userId:string) => {
             if(!dbUser){
                 throw new Error('Not authorized');
             }else{
-                console.log("run here?")
+                console.log("run here updating user cart??")
                 const currCart = dbUser.cart;
                 const existingCartItemIndex = currCart.findIndex((cartItem) => cartItem.itemId === item.id);
+                console.log("existingCartItemIndex", existingCartItemIndex)
                 if(existingCartItemIndex !== -1){
                     const existingCartItem = currCart[existingCartItemIndex];
                     const updatedCartItem = await db.cartItem.update({

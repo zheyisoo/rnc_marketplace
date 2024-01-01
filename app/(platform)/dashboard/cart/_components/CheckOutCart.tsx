@@ -29,6 +29,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import checkOutCart from "@/action/checkOutCart";
+import Category from "@prisma/client"
 
   interface CartProps {
     cart: CartItem[];
@@ -39,6 +40,7 @@ import checkOutCart from "@/action/checkOutCart";
   const CheckOutCart: React.FC<CartProps> = ({cart,itemList,userId}) => {
  
     const [open, setOpen] = useState(true);
+    const [quantity, setQuantity] = useState(0);
 
     const router = useRouter();
 
@@ -55,19 +57,23 @@ import checkOutCart from "@/action/checkOutCart";
     const mergeCartItemsWithItems = (cartItems: CartItem[], items: Item[]): (CartItem & { item: Item })[] => {
       return cartItems.map(cartItem => {
               const item = items.find(item => item.id === cartItem.itemId);
+
+              // Ensure that item is always defined
+              const mergedItem: Item = item || {
+                id: -1, // Provide a default ID or use any other suitable default values
+                name: '',
+                price: 0,
+                category: Category.$Enums.Category.FOOD, // Assuming you have a default category or use any other suitable default
+                quantity: 0,
+                imageUrls: '',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            };
       
-              if (item) {
-                  return {
-                      ...cartItem,
-                      item,
-                  };
-              } else {
-                  // Handle the case where the item is not found (optional)
-                  return {
-                      ...cartItem,
-                      item: null,
-                  };
-              }
+            return {
+                  ...cartItem,
+                  item: mergedItem,
+              };
           });
       };
   

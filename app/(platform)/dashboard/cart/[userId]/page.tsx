@@ -4,7 +4,7 @@ import { db } from '@/lib/db';
 import {currentUser } from "@clerk/nextjs";
 import { CartItem } from '@prisma/client';
 
-const CartPage = async ({params}) => {
+const CartPage = async ({ params }: { params: any }) => {
   // const user = await currentUser()
   let cart: CartItem[] = []
   const itemList = await db.item.findMany()

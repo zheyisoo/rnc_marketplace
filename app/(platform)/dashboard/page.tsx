@@ -9,28 +9,29 @@ import { User } from "@prisma/client";
 
 const Home = async() => {
   const products = await db.item.findMany();
-  const user = await currentUser()
-  let userId = "";
-  if (user && user.id){
-    userId = user.id
-    const dbUser = await db.user.findUnique({
-      where: {
-        externalUSerId : user.id,
-      },
-    })
-    console.log("login User 2", dbUser)
-    if (!dbUser){
-      const newUser = await db.user.create({
-        data: {
-          externalUSerId: user.id,
-          username: user?.username || "unknown",
-          email: user.emailAddresses[0]?.emailAddress || "unknown",
-          password: user.emailAddresses[0]?.emailAddress || "unknown",
-        },
-      })
-      console.log("newUser", newUser)
-    }
-  }
+  // const user = await currentUser()
+  // let userId = "";
+  // console.log("user",user)
+  // if (user && user.id){
+  //   userId = user.id
+  //   const dbUser = await db.user.findUnique({
+  //     where: {
+  //       externalUSerId : user.id,
+  //     },
+  //   })
+  //   console.log("login User 2", dbUser)
+  //   if (!dbUser){
+  //     const newUser = await db.user.create({
+  //       data: {
+  //         externalUSerId: user.id,
+  //         username: user?.username || "unknown",
+  //         email: user.emailAddresses[0]?.emailAddress || "unknown",
+  //         password: user.emailAddresses[0]?.emailAddress || "unknown",
+  //       },
+  //     })
+  //     console.log("newUser", newUser)
+  //   }
+  // }
 
   return (
     <Container>
@@ -52,7 +53,7 @@ const Home = async() => {
           </div>
         </div>
         <div className="flex flex-col gap-y-8 px-4 sm:px-6 lg:px-8">
-          <ProductList items={products} userId={userId} />
+          <ProductList items={products} userId={""} />
         </div>
       </div>
     </Container>

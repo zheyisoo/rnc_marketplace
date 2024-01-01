@@ -35,7 +35,6 @@ export const AddNewItem = () => {
     const [category, setCategory] = useState<Category>(Category.FOOD);
 
     const handleSaveChanges = () => {
-        console.log("run here???")
         const newItem: Item = {
             id: 0,
             name: name,
@@ -44,6 +43,7 @@ export const AddNewItem = () => {
             category: Category.FOOD,
             updatedAt: new Date(),
             createdAt: new Date(),
+            imageUrls: ''
         };
         addNewItem(newItem)
         setIsOpen(false);
