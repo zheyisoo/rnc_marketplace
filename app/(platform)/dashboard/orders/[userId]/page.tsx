@@ -15,18 +15,22 @@ const ItemsPage = async ({ params }: { params: any }) => {
       },
     })
     const orderWithCartItemsAndItemsRaw:OrderWithFullDetails[] = await getOrdersWithCartItemsAndItems(dbUser?.id || 0)
-    console.log("orderWithCartItemsAndItemsRaw", orderWithCartItemsAndItemsRaw[0].status)
-    
+    let itemsTables: OrdersTable[] = []   
+
     // Map the array of OrderWithFullDetails to an array of ItemsTable
-    const itemsTables: OrdersTable[] = orderWithCartItemsAndItemsRaw.map((order) => {
-      const itemsTable: OrdersTable = {
-        id: order.id,
-        orderedBy: order.user.username,
-        items: order.items,
-        status: order.status as Status
-          };
-          return itemsTable;
-    })
+    if (orderWithCartItemsAndItemsRaw !== null && orderWithCartItemsAndItemsRaw !== undefined) {
+      if (orderWithCartItemsAndItemsRaw.length > 0) {
+      itemsTables= orderWithCartItemsAndItemsRaw.map((order) => {
+        const itemsTable: OrdersTable = {
+          id: order.id,
+          orderedBy: order.user.username,
+          items: order.items,
+          status: order.status as Status
+            };
+            return itemsTable;
+      })
+      }
+    }
 
     return (
       <div className='flex-col'>
