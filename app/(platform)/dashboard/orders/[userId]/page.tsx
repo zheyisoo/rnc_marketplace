@@ -6,7 +6,6 @@ import OrderDataTable from '../_components/orderDataTable';
 import {OrderWithFullDetails,OrdersTable} from "@/lib/type"
 
 import {getOrdersWithCartItemsAndItems} from "@/lib/orderService"
-
   
 const ItemsPage = async ({ params }: { params: any }) => {
 
@@ -16,6 +15,7 @@ const ItemsPage = async ({ params }: { params: any }) => {
       },
     })
     const orderWithCartItemsAndItemsRaw:OrderWithFullDetails[] = await getOrdersWithCartItemsAndItems(dbUser?.id || 0)
+    console.log("orderWithCartItemsAndItemsRaw", orderWithCartItemsAndItemsRaw)
     
     // Map the array of OrderWithFullDetails to an array of ItemsTable
     const itemsTables: OrdersTable[] = orderWithCartItemsAndItemsRaw.map((order) => {
@@ -23,7 +23,7 @@ const ItemsPage = async ({ params }: { params: any }) => {
         id: order.id,
         orderedBy: order.user.username,
         items: order.items,
-        status: order.status
+        status: order.status || 'ORDERED'
           };
           return itemsTable;
     })
