@@ -1,15 +1,12 @@
 import React from 'react';
 import CheckOutCart from '../_components/CheckOutCart';
 import { db } from '@/lib/db';
-import {currentUser } from "@clerk/nextjs";
-import { CartItem } from '@prisma/client';
+import { CartItemswithItemsType } from '@/lib/type';
 
 const CartPage = async ({ params }: { params: any }) => {
   // const user = await currentUser()
-  let cart: CartItem[] = []
+  let cart: CartItemswithItemsType[] = []
   const itemList = await db.item.findMany()
-  console.log("user", params.userId)
-
 
   if (params.userId){
     const dbUsers = await db.user.findUnique({
