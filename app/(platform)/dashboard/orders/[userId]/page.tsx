@@ -15,7 +15,7 @@ const ItemsPage = async ({ params }: { params: any }) => {
         externalUSerId : params.userId,
       },
     })
-    const orderWithCartItemsAndItemsRaw:OrderWithFullDetails[] = await getOrdersWithCartItemsAndItems(dbUser?.id |)
+    const orderWithCartItemsAndItemsRaw:OrderWithFullDetails[] = await getOrdersWithCartItemsAndItems(dbUser?.id || 0)
     
     // Map the array of OrderWithFullDetails to an array of ItemsTable
     const itemsTables: OrdersTable[] = orderWithCartItemsAndItemsRaw.map((order) => {
