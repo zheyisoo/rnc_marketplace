@@ -1,17 +1,10 @@
 "use server";
 
 import { db } from '@/lib/db';
-import { Clerk } from '@clerk/nextjs/server';
-import { currentUser } from '@clerk/nextjs/server';
-import { Item } from '@prisma/client';
-import { Transaction } from '@prisma/client';
 import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
-import { User } from '@prisma/client';
 import { CartItem } from '@prisma/client';
 
 const CheckOutCart = async (cartItems:CartItem[],userId:string) => {
-    console.log("run her?")
     try {
         if (!userId) {
             throw new Error('Not authorized');
@@ -36,6 +29,8 @@ const CheckOutCart = async (cartItems:CartItem[],userId:string) => {
                     },
                     select: {
                         id: true,
+                        quantity: true,
+                        itemId: true,
                     },
                 });
                 const cartItemIdsToDisconnect = userCartItems.map(cartItem => ({ id: cartItem.id }));
@@ -50,30 +45,54 @@ const CheckOutCart = async (cartItems:CartItem[],userId:string) => {
                         },
                     },
                 });
-                console.log("cartItemIdsToDisconnect",cartItemIdsToDisconnect)
-                const updatedCartItems = await db.cartItem.updateMany({
+                const items = await db.item.findMany({
                     where: {
                         id: {
-                            in: cartItemIdsToDisconnect.map(cartItem => cartItem.id),
+                            in: cartItems.map(cartItem => cartItem.itemId),
                         },
-                    },
-                    data: {
-                        userId: 0
                     },
                 });
-                const newOrder = await db.order.create({
-                    data: {
-                        userId: dbUser.id,
-                        items: {
-                            connect: cartItemIdsToDisconnect,
-                        },
-                    },
-                })
-                    revalidatePath('/dashboard/cart')
-                    console.log("newOrder", newOrder)
-                    return newOrder;
+                for (const cartItem of userCartItems) {
+                    console.log("cartItem", cartItem.itemId)
+                    const item = items.find(item => item.id === cartItem.itemId);
+                    if (!item) {
+                        throw new Error('Item not found');
+                    }else if(item.quantity < cartItem.quantity){
+                        throw new Error('Item quantity not enough');
+                    }else{
+                        const updatedItem = await db.item.update({
+                            where: {
+                                id: item.id
+                            },
+                            data: {
+                                quantity: item.quantity - cartItem.quantity,
+                            }
+                        })
+                        const updatedCartItems = await db.cartItem.updateMany({
+                            where: {
+                                id: {
+                                    in: cartItemIdsToDisconnect.map(cartItem => cartItem.id),
+                                },
+                            },
+                            data: {
+                                userId: 0
+                            },
+                        });
+                        const newOrder = await db.order.create({
+                            data: {
+                                userId: dbUser.id,
+                                items: {
+                                    connect: cartItemIdsToDisconnect,
+                                },
+                            },
+                        })
+                            revalidatePath('/dashboard/cart')
+                            console.log("newOrder", newOrder)
+                            return newOrder;
+                        }
                 }
         }
+    }
     } catch (error) {
         console.error('Error check out cart item:',error);
         throw error;

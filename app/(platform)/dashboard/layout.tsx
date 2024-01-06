@@ -18,7 +18,8 @@ const DashboardLayout = ({
 
   useEffect(() => {
     if (user && user.username){
-      useUserStore.setState({userId:user.username})
+      console.log("user", user) 
+      useUserStore.setState({userId:user.id})
     }
   }, [user])
 

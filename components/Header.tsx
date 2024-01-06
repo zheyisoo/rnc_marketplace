@@ -23,17 +23,17 @@ const Header: React.FC<HeaderProps> = ({userId}) => {
   const [dbUser, setdbUser] = useState<string>("");
   const routes = [
     {
-      href: "/",
+      href: "/dashboard",
       label: "Products",
     },
     {
-      href: "/",
-      label: "Categories",
+      href: `/dashboard/orders/${dbUser}`,
+      label: "Orders",
     },
-    {
-      href: "/",
-      label: "On Sale",
-    },
+    // {
+    //   href: "/",
+    //   label: "On Sale",
+    // },
   ];
   const router = useRouter();
   const handleOpenCart = () => {

@@ -29,10 +29,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import checkOutCart from "@/action/checkOutCart";
+import {addToUserCart,updateUserCart, removeItemUserCart} from "@/action/updateUserCart";
 import Category from "@prisma/client"
+import { CartItemswithItemsType } from "@/lib/type";
+import { Cross1Icon } from '@radix-ui/react-icons'
 
   interface CartProps {
-    cart: CartItem[];
+    cart: CartItemswithItemsType[];
     itemList : Item[];
     userId: string;
   }
@@ -40,19 +43,56 @@ import Category from "@prisma/client"
   const CheckOutCart: React.FC<CartProps> = ({cart,itemList,userId}) => {
  
     const [open, setOpen] = useState(true);
-    const [quantity, setQuantity] = useState(0);
-
+    const [cartItems, setCartItems] = useState<CartItemswithItemsType[]>(cart);
     const router = useRouter();
 
+    const handleInputChange = (itemId:number, quantity:number) => {
+      const newAdjustedCartItems = [...cartItems];
+      const itemIndex = newAdjustedCartItems.findIndex((item) => item.itemId === itemId);
+      newAdjustedCartItems[itemIndex].quantity = quantity;
+      setCartItems(newAdjustedCartItems);
+    } 
+
     const handleCheckOut = () => {
-      console.log("handleCheckOut")
+      for (const cartItem of cartItems){
+        updateCart(cartItem.item,cartItem.quantity)
+      }
+      setCartItems([])
       checkOutCart(cart,userId);
     }
 
     const handleClose = () => {
+      console.log("got run here??")
+      console.log("cartItems",cartItems)
       setOpen(false);
+      for (const cartItem of cartItems){
+        console.log("cartItem",cartItem)
+        updateCart(cartItem.item,cartItem.quantity)
+      }
       router.push("/dashboard");
     }
+    
+    const updateCart = (item : Item, quantity:number) => {
+      updateUserCart(item,quantity,userId)
+    }
+
+    const handleRemoveFromCart = (item: Item) => {
+      setCartItems((prevCartItems) => {
+        const newAdjustedCartItems = [...prevCartItems];
+        const itemIndex = newAdjustedCartItems.findIndex((cartItem) => cartItem.itemId === item.id);
+        
+        if (itemIndex !== -1) {
+          newAdjustedCartItems.splice(itemIndex, 1);
+          if (newAdjustedCartItems.length === 0) {
+            removeItemUserCart(item, userId);
+            setCartItems([])
+          }else{
+            removeItemUserCart(item, userId);
+          }
+        }
+        return newAdjustedCartItems;
+      });
+    };
     
     const mergeCartItemsWithItems = (cartItems: CartItem[], items: Item[]): (CartItem & { item: Item })[] => {
       return cartItems.map(cartItem => {
@@ -81,9 +121,6 @@ import Category from "@prisma/client"
     // Usage
     const mergedCartItems = mergeCartItemsWithItems(cart, itemList);
     const total = mergedCartItems.reduce((acc, item) => acc + item.quantity * item.item.price, 0);
-    console.log("mergedCartItems",mergedCartItems);
-
-    console.log("cart", cart)
 
     return(
         <Sheet open = {open} onOpenChange={()=> {handleClose()}}>
@@ -104,27 +141,34 @@ import Category from "@prisma/client"
             </TableRow>
         </TableHeader>
         <TableBody>
-          {mergedCartItems.map((item) => (
+          {cartItems.map((item) => (
             <TableRow key={item.id}>
-              <TableCell className="font-medium">{item.item.name}</TableCell>
+            <TableCell className="font-medium">{item.item.name}</TableCell>
             <TableCell>            
-              <Input type="number" id="quantity" 
-              onChange={(e) => setQuantity(parseInt(e.target.value))} 
-              value={item.quantity} 
-              placeholder={item?.quantity.toString()} 
-              className="col-span-3" />
+            <Input
+              type="number"
+              id="quantity"
+              value={item.quantity}
+              onChange={(e) => {
+                const parsedValue = parseInt(e.target.value, 10);
+                if (!isNaN(parsedValue)) {
+                  handleInputChange(item.item.id, parsedValue);
+                }
+              }}
+              placeholder={item?.quantity.toString()}
+              className="col-span-3"
+            />
               </TableCell>
-              <TableCell className="text-right">{item.quantity * item.item.price}</TableCell>
+              <TableCell className="text-right">
+                { (item.quantity * item.item.price).toFixed(2) }
+              </TableCell>              
+              <TableCell className="text-right">
+              <Cross1Icon onClick={()=> {
+                handleRemoveFromCart(item.item)
+              }}/>          
+              </TableCell>
             </TableRow> 
           ))}
-            {/* {invoices.map((invoice) => (
-            <TableRow key={invoice.invoice}>
-                <TableCell className="font-medium">{invoice.invoice}</TableCell>
-                <TableCell>{invoice.paymentStatus}</TableCell>
-                <TableCell>{invoice.paymentMethod}</TableCell>
-                <TableCell className="text-right">{invoice.totalAmount}</TableCell>
-            </TableRow>
-            ))} */}
         </TableBody>
         <TableFooter>
             <TableRow>
@@ -139,7 +183,6 @@ import Category from "@prisma/client"
         </SheetContent>
     </Sheet>  
     )
-  
   }
 
   export default CheckOutCart;

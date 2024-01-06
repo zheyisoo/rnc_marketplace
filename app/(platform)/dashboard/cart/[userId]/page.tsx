@@ -23,12 +23,15 @@ const CartPage = async ({ params }: { params: any }) => {
     const carts = await db.cartItem.findMany({
       where: {
         userId: dbUsers?.id
+      },
+      include: {
+        item: true
       }
     })
-    console.log("dbUsers", dbUsers)
-    console.log("carts", carts) 
     cart = carts || []
   }
+
+  console.log("cart server", cart)
 
 
   return (

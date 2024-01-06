@@ -22,7 +22,7 @@ import { Category } from '@prisma/client';
 import { useAuth,useUser } from "@clerk/nextjs";
 
 
-import updateUserCart from '@/action/updateUserCart';
+import {addToUserCart} from '@/action/updateUserCart';
 
 
 interface ItemDetailProps {
@@ -41,7 +41,7 @@ const ProductDetail: React.FC<ItemDetailProps> = ({item,userId}) => {
 
 
     const handleAddToCart = () => {
-        updateUserCart(item, quantity,dbUser)
+        addToUserCart(item, quantity,dbUser)
         setIsOpen(false);
     }
 

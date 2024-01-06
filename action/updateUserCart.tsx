@@ -10,7 +10,7 @@ import { redirect } from 'next/navigation'
 import { User } from '@prisma/client';
 import { CartItem } from '@prisma/client';
 
-const updateUserCart = async (item:Item, quantity:number,userId:string) => {
+export const updateUserCart = async (item:Item, quantity:number,userId:string) => {
     try {
         // const user = await currentUser();
         if (!userId) {
@@ -28,10 +28,12 @@ const updateUserCart = async (item:Item, quantity:number,userId:string) => {
             if(!dbUser){
                 throw new Error('Not authorized');
             }else{
-                console.log("run here updating user cart??")
-                const currCart = dbUser.cart;
+                const currCart = await db.cartItem.findMany({
+                    where: {
+                        userId: dbUser.id,
+                    }
+                })
                 const existingCartItemIndex = currCart.findIndex((cartItem) => cartItem.itemId === item.id);
-                console.log("existingCartItemIndex", existingCartItemIndex)
                 if(existingCartItemIndex !== -1){
                     const existingCartItem = currCart[existingCartItemIndex];
                     const updatedCartItem = await db.cartItem.update({
@@ -39,10 +41,9 @@ const updateUserCart = async (item:Item, quantity:number,userId:string) => {
                             id: existingCartItem.id
                         },
                         data: {
-                            quantity: existingCartItem.quantity + quantity,
+                            quantity: quantity,
                         }
                     })
-                    console.log("updatedCartItem", updatedCartItem)
                     revalidatePath('/dashboard/cart')
                     return updatedCartItem;
                 }else{
@@ -65,4 +66,94 @@ const updateUserCart = async (item:Item, quantity:number,userId:string) => {
     }
 };
 
-export default updateUserCart;
+export const addToUserCart = async (item:Item, quantity:number,userId:string) => {
+    try {
+        // const user = await currentUser();
+        if (!userId) {
+            throw new Error('Not authorized');
+        }else{
+            const dbUser = await db.user.findUnique({
+                where: {
+                    externalUSerId : userId,
+                },
+                include: {
+                    cart: true,
+                }
+            })
+
+            if(!dbUser){
+                throw new Error('Not authorized');
+            }else{
+                const currCart = await db.cartItem.findMany({
+                    where: {
+                        userId: dbUser.id,
+                    }
+                })
+                const existingCartItemIndex = currCart.findIndex((cartItem) => cartItem.itemId === item.id);
+                if(existingCartItemIndex !== -1){
+                    const existingCartItem = currCart[existingCartItemIndex];
+                    const updatedCartItem = await db.cartItem.update({
+                        where: {
+                            id: existingCartItem.id
+                        },
+                        data: {
+                            quantity: existingCartItem.quantity + quantity,
+                        }
+                    })
+                    revalidatePath('/dashboard/cart')
+                    return updatedCartItem;
+                }else{
+                    const newCartItem = await db.cartItem.create({
+                        data: {
+                            itemId: item.id,
+                            quantity: quantity,
+                            userId: dbUser.id,
+                        }
+                    })
+                    console.log("newCartItem", newCartItem)
+                    revalidatePath('/dashboard/cart')
+                    return newCartItem;
+                }
+        }
+    }
+    } catch (error) {
+        console.error('Error update cart item:',item.id, error);
+        throw error;
+    }
+};
+
+
+export const removeItemUserCart = async (item:Item,userId:string) => {
+    try {
+        // const user = await currentUser();
+        if (!userId) {
+            throw new Error('Not authorized');
+        }else{
+            const dbUser = await db.user.findUnique({
+                where: {
+                    externalUSerId : userId,
+                },
+                include: {
+                    cart: true,
+                }
+            })
+
+            if(!dbUser){
+                throw new Error('Not authorized');
+            }else{
+                console.log("dbUser",dbUser)
+                console.log("item",item.id)
+                const updatedCart = await db.cartItem.deleteMany({
+                    where: {
+                        userId: dbUser.id,
+                        itemId: item.id,
+                    }
+                })
+            revalidatePath('/dashboard/cart')
+        }
+    }
+    } catch (error) {
+        console.error('Error update cart item:',item.id, error);
+        throw error;
+    }
+};
